@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 
+using namespace std;
+
 const int MAX_N = 100001;
 
 void Eratosphen(std::vector<bool> & p)
@@ -14,8 +16,6 @@ void Eratosphen(std::vector<bool> & p)
                     p[j] = false;
     }
 }
-
-using namespace std;
 
 int main(int argc, char* argv[])
 {
