@@ -5,19 +5,15 @@
 #include<string>
 #include<algorithm>
 
-
-
 using namespace std;
 
-string a;
-int n, curr = 0;
-
-long long eval0()
+long long parse_double(string & a, int & n, int &curr, int & error_flag)
 {
     if (curr < 0)
     {
         cout << "error" << endl;
-        exit(1);
+        error_flag = 1;
+        return 1;
     }
     if (isdigit(a[curr]))
     {
@@ -31,28 +27,40 @@ long long eval0()
     else
     {
         cout << "error" << endl;
-        exit(1);
+        error_flag = 1;
+        return 1;
     }
 }
 
-long long eval1()
+long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
 {
-    long long right = eval0();
+    long long right = parse_double(a, n, curr, error_flag);
+    if (error_flag)
+        return 1;
     if (curr < 0)
         return right;
     if (a[curr] == '*' || a[curr] == '/')
     {
         --curr;
         if (a[curr + 1] == '*')
-            return eval1() * right;
+        {
+            double d = parse_mul_div(a, n, curr, error_flag);
+            if (error_flag)
+                return 1;
+            return d * right;
+        }
         else
         {
             if (right == 0)
             {
                 cout << "error" << endl;
-                exit(1);
+                error_flag = 1;
+                return 1;
             }
-            return eval1() / right;
+            double d = parse_mul_div(a, n, curr, error_flag);
+            if (error_flag)
+                return 1;
+            return d / right;
         }
     }
     else
@@ -60,25 +68,39 @@ long long eval1()
         if (a[curr] != '+' && a[curr] != '-')
         {
             cout << "error" << endl;
-            exit(1);
+            error_flag = 1;
+            return 1;
         }
         else
             return right;
     }
 }
 
-long long eval2()
+long long parse_plus_minus(string & a, int & n, int & curr, int & error_flag)
 {
-    long long right = eval1();
+
+    long long right = parse_mul_div(a, n, curr, error_flag);
+    if (error_flag)
+        return 1;
     if (curr < 0)
         return right;
     if (a[curr] == '+' || a[curr] == '-')
     {
         --curr;
         if (a[curr + 1] == '+')
-            return eval2() + right;
+        {
+            double d = parse_plus_minus(a, n, curr, error_flag);
+            if (error_flag)
+                return 1;
+            return d + right;
+        }
         else
-            return eval2() - right;
+        {
+            double d = parse_plus_minus(a, n, curr, error_flag);
+            if (error_flag)
+                return 1;
+            return d - right;
+        }
     }
 }
 
@@ -87,13 +109,17 @@ int main(int argc, char* argv[])
     if (argc != 2)
     {
         cout << "error" << endl;
-        exit(1);
+        return 1;
     }
-    a = argv[1];
+    string a = argv[1];
     //getline(cin, a);
     a.erase(remove(a.begin(), a.end(), ' '), a.end());
-    n = a.size();
-    curr = n - 1;
-    cout << eval2() << endl;
+    int n = a.size();
+    int curr = n - 1;
+    int error_flag = 0;
+    double d = parse_plus_minus(a, n, curr, error_flag);
+    if (error_flag)
+        return 1;
+    cout << d << endl;
     return 0;
 }
