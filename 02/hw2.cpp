@@ -11,7 +11,6 @@ long long parse_double(string & a, int & n, int &curr, int & error_flag)
 {
     if (curr < 0)
     {
-        cout << "error" << endl;
         error_flag = 1;
         return 1;
     }
@@ -26,7 +25,6 @@ long long parse_double(string & a, int & n, int &curr, int & error_flag)
     }
     else
     {
-        cout << "error" << endl;
         error_flag = 1;
         return 1;
     }
@@ -53,7 +51,6 @@ long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
         {
             if (right == 0)
             {
-                cout << "error" << endl;
                 error_flag = 1;
                 return 1;
             }
@@ -67,7 +64,6 @@ long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
     {
         if (a[curr] != '+' && a[curr] != '-')
         {
-            cout << "error" << endl;
             error_flag = 1;
             return 1;
         }
@@ -119,7 +115,10 @@ int main(int argc, char* argv[])
     int error_flag = 0;
     double d = parse_plus_minus(a, n, curr, error_flag);
     if (error_flag)
+    {
+        cout << "error" << endl;
         return 1;
+    }
     cout << d << endl;
     return 0;
 }
