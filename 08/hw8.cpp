@@ -19,7 +19,6 @@ void ping()
             cv.wait(l);
         cout << "ping" << endl;
         notified = true;
-        l.unlock();
         cv.notify_all();
     }
 }
@@ -34,7 +33,6 @@ int main()
         cv.wait(l);
 	cout << "pong" << endl;
 	notified = false;
-	l.unlock();
 	cv.notify_all();
     }
     t.join();
