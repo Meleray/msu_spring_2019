@@ -7,6 +7,12 @@
 
 using namespace std;
 
+void skip_spaces(string & a, int & curr)
+{
+    while (curr >= 0 && a[curr] == ' ')
+        --curr;
+}
+
 long long parse_double(string & a, int & n, int &curr, int & error_flag)
 {
     if (curr < 0)
@@ -14,6 +20,7 @@ long long parse_double(string & a, int & n, int &curr, int & error_flag)
         error_flag = 1;
         return 1;
     }
+    skip_spaces(a, curr);
     if (isdigit(a[curr]))
     {
         int en = curr;
@@ -35,6 +42,7 @@ long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
     long long right = parse_double(a, n, curr, error_flag);
     if (error_flag)
         return 1;
+    skip_spaces(a, curr);
     if (curr < 0)
         return right;
     if (a[curr] == '*' || a[curr] == '/')
@@ -74,10 +82,10 @@ long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
 
 long long parse_plus_minus(string & a, int & n, int & curr, int & error_flag)
 {
-
     long long right = parse_mul_div(a, n, curr, error_flag);
     if (error_flag)
         return 1;
+    skip_spaces(a, curr);
     if (curr < 0)
         return right;
     if (a[curr] == '+' || a[curr] == '-')
@@ -108,8 +116,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     string a = argv[1];
-    //getline(cin, a);
-    a.erase(remove(a.begin(), a.end(), ' '), a.end());
+    getline(cin, a);
     int n = a.size();
     int curr = n - 1;
     int error_flag = 0;
