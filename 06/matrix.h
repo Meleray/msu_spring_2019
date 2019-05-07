@@ -2,11 +2,11 @@
 
 using namespace std;
 
-class row
+class Row
 {
     vector<int> vals;
 public:
-    row(size_t n)
+    Row(size_t n)
     {
         vals.resize(n, 0);
     }
@@ -26,12 +26,13 @@ public:
     {
         return vals.size();
     }
-    void operator*=(int k)
+    Row& operator*=(int k)
     {
         for (int i = 0; i < vals.size(); ++i)
             vals[i] *= k;
+        return *this;
     }
-    bool operator==(const row & a) const
+    bool operator==(const Row & a) const
     {
         if (vals.size() != a.vals.size())
             return 0;
@@ -46,19 +47,19 @@ public:
 
 class Matrix
 {
-    vector<row> a;
+    vector<Row> a;
 public:
-    Matrix(size_t n, size_t m)
+    Matrix(size_t n, size_t m) : a (n, Row(m))
     {
-        a.resize(n, row(m));
+
     }
-    const row operator[](int i) const
+    const Row operator[](int i) const
     {
         if (i < 0|| i >= a.size())
             throw std::out_of_range("");
         return a[i];
     }
-    row operator[](int i)
+    Row operator[](int i)
     {
         if (i < 0|| i >= a.size())
             throw std::out_of_range("");
@@ -72,10 +73,11 @@ public:
     {
         return a[0].getSize();
     }
-    void operator*=(int k)
+    Matrix& operator*=(int k)
     {
         for (int i = 0; i < a.size(); ++i)
             a[i] *= k;
+        return *this;
     }
     bool operator==(const Matrix & b) const
     {
