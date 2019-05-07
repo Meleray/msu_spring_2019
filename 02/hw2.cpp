@@ -13,7 +13,7 @@ void skip_spaces(string & a, int & curr)
         --curr;
 }
 
-long long parse_double(string & a, int & n, int &curr, int & error_flag)
+long long parse_double(string & a, int &curr, int & error_flag)
 {
     if (curr < 0)
     {
@@ -37,9 +37,9 @@ long long parse_double(string & a, int & n, int &curr, int & error_flag)
     }
 }
 
-long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
+long long parse_mul_div(string & a, int &curr, int & error_flag)
 {
-    long long right = parse_double(a, n, curr, error_flag);
+    long long right = parse_double(a, curr, error_flag);
     if (error_flag)
         return 1;
     skip_spaces(a, curr);
@@ -50,7 +50,7 @@ long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
         --curr;
         if (a[curr + 1] == '*')
         {
-            double d = parse_mul_div(a, n, curr, error_flag);
+            double d = parse_mul_div(a, curr, error_flag);
             if (error_flag)
                 return 1;
             return d * right;
@@ -62,7 +62,7 @@ long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
                 error_flag = 1;
                 return 1;
             }
-            double d = parse_mul_div(a, n, curr, error_flag);
+            double d = parse_mul_div(a, curr, error_flag);
             if (error_flag)
                 return 1;
             return d / right;
@@ -80,9 +80,9 @@ long long parse_mul_div(string & a, int & n, int &curr, int & error_flag)
     }
 }
 
-long long parse_plus_minus(string & a, int & n, int & curr, int & error_flag)
+long long parse_plus_minus(string & a, int & curr, int & error_flag)
 {
-    long long right = parse_mul_div(a, n, curr, error_flag);
+    long long right = parse_mul_div(a, curr, error_flag);
     if (error_flag)
         return 1;
     skip_spaces(a, curr);
@@ -93,14 +93,14 @@ long long parse_plus_minus(string & a, int & n, int & curr, int & error_flag)
         --curr;
         if (a[curr + 1] == '+')
         {
-            double d = parse_plus_minus(a, n, curr, error_flag);
+            double d = parse_plus_minus(a, curr, error_flag);
             if (error_flag)
                 return 1;
             return d + right;
         }
         else
         {
-            double d = parse_plus_minus(a, n, curr, error_flag);
+            double d = parse_plus_minus(a, curr, error_flag);
             if (error_flag)
                 return 1;
             return d - right;
@@ -116,11 +116,9 @@ int main(int argc, char* argv[])
         return 1;
     }
     string a = argv[1];
-    getline(cin, a);
-    int n = a.size();
-    int curr = n - 1;
+    int curr = a.size() - 1;
     int error_flag = 0;
-    double d = parse_plus_minus(a, n, curr, error_flag);
+    double d = parse_plus_minus(a, curr, error_flag);
     if (error_flag)
     {
         cout << "error" << endl;
