@@ -20,20 +20,19 @@ public:
     }
 
     template <class... ArgsT>
-    Error operator()(ArgsT... args)
+    Error operator()(ArgsT&&... args)
     {
         return process(args...);
     }
 
 private:
-
-    Error process(uint64_t arg)
+    Error process(uint64_t& arg)
     {
         out_ << arg;
         return Error::NoError;
     }
 
-    Error process(bool arg)
+    Error process(bool& arg)
     {
         if (arg)
             out_ << "true";
@@ -43,7 +42,7 @@ private:
     }
 
     template <class T, class... ArgsT>
-    Error process(T arg, ArgsT... args)
+    Error process(T&& arg, ArgsT&&... args)
     {
         if (process(arg) == Error::NoError)
         {
