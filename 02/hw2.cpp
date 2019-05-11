@@ -7,13 +7,13 @@
 
 using namespace std;
 
-void skip_spaces(string & a, int & curr)
+void skip_spaces(сonst string & a, int & curr)
 {
     while (curr >= 0 && a[curr] == ' ')
         --curr;
 }
 
-long long parse_double(string & a, int &curr, int & error_flag)
+long long parse_double(const string & a, int &curr, int & error_flag)
 {
     if (curr < 0)
     {
@@ -37,7 +37,7 @@ long long parse_double(string & a, int &curr, int & error_flag)
     }
 }
 
-long long parse_mul_div(string & a, int &curr, int & error_flag)
+long long parse_mul_div(const string & a, int &curr, int & error_flag)
 {
     long long right = parse_double(a, curr, error_flag);
     if (error_flag)
@@ -80,7 +80,7 @@ long long parse_mul_div(string & a, int &curr, int & error_flag)
     }
 }
 
-long long parse_plus_minus(string & a, int & curr, int & error_flag)
+long long parse_plus_minus(const string & a, int & curr, int & error_flag)
 {
     long long right = parse_mul_div(a, curr, error_flag);
     if (error_flag)
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
         cout << "error" << endl;
         return 1;
     }
-    string a = argv[1];
+    const string a = argv[1];
     int curr = a.size() - 1;
     int error_flag = 0;
     double d = parse_plus_minus(a, curr, error_flag);
