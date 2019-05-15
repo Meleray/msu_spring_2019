@@ -16,16 +16,8 @@ void write(string a)
     for (int i = 0; i < num; ++i)
     {
         std::unique_lock<std::mutex> l(m);
-        if (a == "ping")
-        {
-            while (notified)
-                cv.wait(l);
-        }
-        else
-        {
-            while (!notified)
-                cv.wait(l);
-        }
+        while (a == "ping" ? notified : !notified)
+            cv.wait(l);
         cout << a << endl;
         notified = (a == "ping");
         cv.notify_all();
