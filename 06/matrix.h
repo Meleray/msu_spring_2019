@@ -6,9 +6,9 @@ class Row
 {
     vector<int> vals;
 public:
-    Row(size_t n)
+    Row(size_t n) : vals (n, 0)
     {
-        vals.resize(n, 0);
+        
     }
     int operator[](int i) const
     {
