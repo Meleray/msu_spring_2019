@@ -22,7 +22,7 @@ public:
     template <class... ArgsT>
     Error operator()(ArgsT&&... args)
     {
-        return process(args...);
+        return process(std::forward<ArgsT>(args)...);
     }
 
 private:
@@ -44,10 +44,10 @@ private:
     template <class T, class... ArgsT>
     Error process(T&& arg, ArgsT&&... args)
     {
-        if (process(arg) == Error::NoError)
+        if (std::forward<T>(arg) == Error::NoError)
         {
             out_ << Separator;
-            return process(args...);
+            return process(std::forward<ArgsT>(args)...);
         }
         else
             return Error::CorruptedArchive;
@@ -71,7 +71,7 @@ public:
     template <class... ArgsT>
     Error operator()(ArgsT&&... args)
     {
-        return process(args...);
+        return process(std::forward<ArgsT>(args)...);
     }
 
 private:
