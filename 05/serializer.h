@@ -26,13 +26,13 @@ public:
     }
 
 private:
-    Error process(uint64_t& arg)
+    Error process(uint64_t arg)
     {
         out_ << arg;
         return Error::NoError;
     }
 
-    Error process(bool& arg)
+    Error process(bool arg)
     {
         if (arg)
             out_ << "true";
