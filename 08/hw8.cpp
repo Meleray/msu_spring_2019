@@ -13,13 +13,14 @@ bool notified = false;
 
 void write(const string & a)
 {
+    bool tmp = (a == "ping");
     for (int i = 0; i < num; ++i)
     {
         std::unique_lock<std::mutex> l(m);
-        while (a == "ping" ? notified : !notified)
+        while (tmp ? notified : !notified)
             cv.wait(l);
         cout << a << endl;
-        notified = (a == "ping");
+        notified = tmp;
         cv.notify_all();
     }
 }
