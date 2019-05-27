@@ -11,7 +11,7 @@ std::mutex m;
 std::condition_variable cv;
 bool notified = false;
 
-void write(string & a)
+void write(const string & a)
 {
     for (int i = 0; i < num; ++i)
     {
