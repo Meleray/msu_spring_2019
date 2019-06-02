@@ -8,14 +8,11 @@
 
 using namespace std;
 
-uint64_t counter = 0;
-bool outend = false;
-bool ready = false;
 mutex m;
 condition_variable processed;
 const uint64_t MaxN = numeric_limits<uint64_t>::max();
 
-void Count(string name)
+void Count(string &name, bool &ready, bool &outend, uint64_t &counter)
 {
 	for (uint64_t curr = 0; curr <= MaxN; ++curr)
     	{
@@ -38,7 +35,7 @@ void Count(string name)
 	}
 }
 
-void Out(string name)
+void Out(string &name, , bool &ready, bool &outend, uint64_t &counter)
 {
 	ofstream out(name);
 	for (uint64_t curr = 0; curr <= MaxN; ++curr)
@@ -60,8 +57,13 @@ void Out(string name)
 
 int main()
 {
-	thread t1(Count, "input.bin");
-	thread t2(Out, "output.txt");
+	uint64_t counter = 0;
+	bool outend = false;
+	bool ready = false;
+	string a = "input.bin";
+	string b = "output.txt";
+	thread t1(Count, std::ref(a), std::ref(ready), std::ref(outend), std::ref(counter));
+	thread t2(Out, std::ref(b), std::ref(ready), std::ref(outend), std::ref(counter));
 	t1.join();
 	t2.join();
 	return 0;
