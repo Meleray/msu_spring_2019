@@ -1,68 +1,111 @@
-#include<iostream>
-#include<fstream>
-#include<ostream>
-#include<mutex>
-#include<thread>
-#include<condition_variable>
-#include<limits>
+#include <thread>
+#include <mutex>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cstdio>
 
 using namespace std;
 
+const uint64_t batch_size = 1000000;
 mutex m;
-condition_variable processed;
-const uint64_t MaxN = numeric_limits<uint64_t>::max();
 
-void Count(ifstream & in, bool &ready, bool &outend, uint64_t &counter)
+void Merge_end(ifstream & in, ofstream & out, uint64_t & curr)
 {
-	for (uint64_t curr = 0; curr <= MaxN; ++curr)
-    	{
-		unique_lock<mutex> lock(m);
-		while (!outend)
-            		processed.wait(lock);
-		counter = 0;
-		uint64_t x;
-		for (; in.read((char *) &x, sizeof(uint64_t));)
-        	{
-			if (x == curr)
-                		++counter;
-		}
-		in.clear();
-		in.seekg(0, ios::beg);
-		lock.unlock();
-        	ready = true;
-		outend = false;
-		processed.notify_one();
-	}
+    while (!in.eof())
+    {
+        out.write((char*)(&curr), sizeof(curr));
+        in.read((char*)(&curr), sizeof(curr));
+    }
 }
 
-void Out(ofstream & out, bool &ready, bool &outend, uint64_t &counter)
+void Merge(string &name_1, string &name_2, string &name_res)
 {
-	for (uint64_t curr = 0; curr <= MaxN; ++curr)
-    	{
-		unique_lock<mutex> lock(m);
-		outend = true;
-		processed.notify_one();
-		while (!ready)
-            		processed.wait(lock);
-        	uint64_t tmp = counter;
-		for (uint64_t i = 0; i < tmp; ++i)
-			out << curr << ' ';
-		ready = false;
-		lock.unlock();
-	}
+    ifstream in1(name_1, ios::binary);
+    ifstream in2(name_2, ios::binary);
+    ofstream out(name_res, ios::binary);
+    uint64_t a, b;
+    in1.read((char*)(&a), sizeof(a));
+    in2.read((char*)(&b), sizeof(b));
+    while(!in1.eof() && !in2.eof())
+    {
+        if (a > b)
+        {
+            out.write((char*)(&b), sizeof(b));
+            in2.read((char*)(&b), sizeof(b));
+        }
+        else
+        {
+            out.write((char*)(&a), sizeof(a));
+            in1.read((char*)(&a), sizeof(a));
+        }
+    }
+    if (in1.eof())
+        Merge_end(ref(in2), ref(out), ref(b));
+    else
+        Merge_end(ref(in1), ref(out), ref(a));
+    in1.close();
+    in2.close();
+    out.close();
 }
 
+void Sort(ifstream &in, string &type)
+{
+    uint64_t counter = 0;
+    while (!in.eof())
+    {
+        m.lock();
+        uint64_t curr;
+        vector<uint64_t> a;
+        for (int i = 0; i < batch_size; ++i)
+        {
+            in.read((char*)(&curr), sizeof(curr));
+            if(in.eof())
+                break;
+            a.push_back(curr);
+        }
+        if (a.size() == 0)
+            break;
+        m.unlock();
+        sort(a.begin(), a.end());
+        ofstream out(type + to_string(counter), ios::binary);
+        out.write((char*)(&a[0]), a.size() * sizeof(uint64_t));
+        ++counter;
+        std::this_thread::yield();
+    }
+    --counter;
+    while (counter > 0)
+    {
+        m.lock();
+        string n1 = type + to_string(counter);
+        string n2 = type + to_string(counter - 1);
+        string res = type + "tmp";
+        Merge(ref(n1), ref(n2), ref(res));
+        m.unlock();
+        remove(n1.c_str());
+        remove(n2.c_str());
+        rename(res.c_str(), n2.c_str());
+        --counter;
+        std::this_thread::yield();
+    }
+}
 
 int main()
 {
-	uint64_t counter = 0;
-	bool outend = false;
-	bool ready = false;
-	ifstream in("input.bin", std::ios::binary | std::ios::in);
-	ofstream out("output.txt");
-	thread t1(Count, std::ref(in), std::ref(ready), std::ref(outend), std::ref(counter));
-	thread t2(Out, std::ref(out), std::ref(ready), std::ref(outend), std::ref(counter));
-	t1.join();
-	t2.join();
-	return 0;
+    ifstream in("input.bin", ios::binary);
+    string type1 = "t1";
+    string type2 = "t2";
+    thread t1(Sort, ref(in), ref(type1));
+    thread t2(Sort, ref(in), ref(type2));
+    t1.join();
+    t2.join();
+    string a = "10";
+    string b = "20";
+    string ans = "output.bin";
+    Merge(a, b, ans);
+    remove(a.c_str());
+    remove(b.c_str());
+    in.close();
+    return 0;
 }
