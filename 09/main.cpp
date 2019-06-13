@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const uint64_t batch_size = 250000;
+const uint64_t batch_size = 100000;
 
 void Merge_end(ifstream & in, ofstream & out, uint64_t & curr)
 {
@@ -100,8 +100,8 @@ int main()
     thread t2(Sort, ref(in), type2, ref(m));
     t1.join();
     t2.join();
-    string a = "10";//имя файла, в который будут "слиты" все файлы, на которые первый поток разобъёт исходный файл
-    string b = "20";//аналогично и для второго потока
+    string a = "t10";//имя файла, в который будут "слиты" все файлы, на которые первый поток разобъёт исходный файл
+    string b = "t20";//аналогично и для второго потока
     string ans = "output.bin";
     Merge(a, b, ans);
     remove(a.c_str());
