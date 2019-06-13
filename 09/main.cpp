@@ -8,8 +8,7 @@
 
 using namespace std;
 
-const uint64_t batch_size = 1000000;
-mutex m;
+const uint64_t batch_size = 250000;
 
 void Merge_end(ifstream & in, ofstream & out, uint64_t & curr)
 {
@@ -20,7 +19,7 @@ void Merge_end(ifstream & in, ofstream & out, uint64_t & curr)
     }
 }
 
-void Merge(string &name_1, string &name_2, string &name_res)
+void Merge(string name_1, string name_2, string name_res)
 {
     ifstream in1(name_1, ios::binary);
     ifstream in2(name_2, ios::binary);
@@ -42,15 +41,15 @@ void Merge(string &name_1, string &name_2, string &name_res)
         }
     }
     if (in1.eof())
-        Merge_end(ref(in2), ref(out), ref(b));
+        Merge_end(in2, out, b);
     else
-        Merge_end(ref(in1), ref(out), ref(a));
+        Merge_end(in1, out, a);
     in1.close();
     in2.close();
     out.close();
 }
 
-void Sort(ifstream &in, string &type)
+void Sort(ifstream &in, string type, mutex &m)
 {
     uint64_t counter = 0;
     while (!in.eof())
@@ -81,7 +80,7 @@ void Sort(ifstream &in, string &type)
         string n1 = type + to_string(counter);
         string n2 = type + to_string(counter - 1);
         string res = type + "tmp";
-        Merge(ref(n1), ref(n2), ref(res));
+        Merge(n1, n2, res);
         m.unlock();
         remove(n1.c_str());
         remove(n2.c_str());
@@ -93,15 +92,16 @@ void Sort(ifstream &in, string &type)
 
 int main()
 {
+    mutex m;
     ifstream in("input.bin", ios::binary);
     string type1 = "t1";
     string type2 = "t2";
-    thread t1(Sort, ref(in), ref(type1));
-    thread t2(Sort, ref(in), ref(type2));
+    thread t1(Sort, ref(in), type1, ref(m));
+    thread t2(Sort, ref(in), type2, ref(m));
     t1.join();
     t2.join();
-    string a = "10";
-    string b = "20";
+    string a = "10";//имя файла, в который будут "слиты" все файлы, на которые первый поток разобъёт исходный файл
+    string b = "20";//аналогично и для второго потока
     string ans = "output.bin";
     Merge(a, b, ans);
     remove(a.c_str());
